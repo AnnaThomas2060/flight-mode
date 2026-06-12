@@ -1,4 +1,4 @@
-<p align="center"><img src="docs/first-day.png" width="640" alt="Flight Focus — first class cabin, in flight" /></p>
+<p align="center"><img src="img/first-day.png" width="640" alt="Flight Focus — first class cabin, in flight" /></p>
 <h1 align="center">Flight Focus ✈</h1>
 <p align="center">
   <strong>your focus session, boarded as a real flight</strong>
@@ -36,9 +36,9 @@ Completing flights earns miles. Miles buy cosmetic seat upgrades — the timer i
 | **First** | 1,500 mi | White suite: three windows, marble-top cabinet, table lamp, champagne |
 
 <p align="center">
-  <img src="docs/economy-day.png" width="32%" alt="Economy, day" />
-  <img src="docs/business-night.png" width="32%" alt="Business, night" />
-  <img src="docs/first-day.png" width="32%" alt="First class, day" />
+  <img src="img/economy-day.png" width="32%" alt="Economy, day" />
+  <img src="img/business-night.png" width="32%" alt="Business, night" />
+  <img src="img/first-day.png" width="32%" alt="First class, day" />
 </p>
 
 Cabin lighting follows **your local time** — bright by day, dimmed with stars, glowing lamps and a blinking wingtip light after dark.

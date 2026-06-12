@@ -1,7 +1,7 @@
 <p align="center">
-  <img src="img/flight-focus-icon.svg" width="640" alt="Flight Focus — in flight" />
+  <img src="img/flight-focus-icon.svg" width="640" alt="Flight Mode — in flight" />
 </p>
-<h1 align="center">Flight Focus ✈</h1>
+<h1 align="center">Flight Mode ✈</h1>
 <p align="center">
   <strong>your focus session, boarded as a real flight</strong>
 </p>
@@ -23,7 +23,7 @@
 
 ## What It Is
 
-Flight Focus turns a focus session into an airplane flight. Tell it how long you want to work and where you're departing from, and it matches a **real flight route** of similar duration from a bundled dataset of 21,310 routes — then prints your boarding pass and seats you at a window.
+Flight Mode turns a focus session into an airplane flight. Tell it how long you want to work and where you're departing from, and it matches a **real flight route** of similar duration from a bundled dataset of 21,310 routes — then prints your boarding pass and seats you at a window.
 
 **There is no countdown timer.** The only progress indicator is a small plane crossing the route line, plus the wall clock. The flight keeps flying when you switch apps (no penalty). About five minutes before landing, a gentle cabin chime and an OS notification tell you to prepare for descent.
 

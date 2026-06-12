@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; frame-src https://www.youtube-nocookie.com https://www.youtube.com; media-src 'self'" />
+  <title>Flight Focus</title>
+  <link rel="stylesheet" href="styles/base.css" />
+  <link rel="stylesheet" href="styles/cabin.css" />
+  <link rel="stylesheet" href="styles/components.css" />
+</head>
+<body>
+  <header id="topbar">
+    <div id="brand">✈ Flight Focus</div>
+    <div id="topbar-right">
+      <span id="wallet-chip" title="Mileage balance"></span>
+      <span id="seat-chip" title="Active seat class"></span>
+      <span id="clock"></span>
+    </div>
+  </header>
+
+  <main id="screen"><!-- active screen renders here --></main>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

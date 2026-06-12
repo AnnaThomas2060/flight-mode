@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+
+# Build output — installers are distributed via GitHub Releases, not the repo
+exec-app/
+
+# Personal reference images (stock photos — not licensed for redistribution)
+references/
+
+# Local AI-tooling state
+.claude/
+
+# macOS cruft
+.DS_Store
+
+# Logs
+*.log
+npm-debug.log*
+
+# Legacy/alternative build dir from the spec (unused, just in case)
+dist/

@@ -1,0 +1,50 @@
+{
+  "name": "flight-focus",
+  "productName": "Flight Focus",
+  "version": "1.0.0",
+  "description": "An offline desktop app that turns a focus session into an airplane flight.",
+  "author": "Anna Thomas",
+  "main": "main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder"
+  },
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "electron": "^42.4.0",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "com.flightfocus.app",
+    "productName": "Flight Focus",
+    "directories": {
+      "output": "exec-app"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**/*",
+      "!references/**",
+      "!tools/**",
+      "!exec-app/**"
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "identity": null,
+      "target": [
+        { "target": "dmg", "arch": ["arm64"] },
+        { "target": "zip", "arch": ["arm64"] }
+      ]
+    },
+    "win": {
+      "target": [
+        { "target": "nsis", "arch": ["x64"] }
+      ]
+    },
+    "nsis": {
+      "oneClick": true,
+      "deleteAppDataOnUninstall": false
+    }
+  }
+}

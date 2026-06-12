@@ -1,0 +1,1089 @@
+/* ===== In-flight scene (Section 8) =====
+   First-person window-seat POV, modeled on the photos in references/:
+   the window wall recedes on the LEFT (perpendicular to the seat), and
+   what sits AHEAD depends on the class — economy: the seatback in front
+   with your laptop on its tray; business: an Emirates-style cream pod with
+   wood console + minibar; first: a bright white suite with an ottoman,
+   red pillow, lamp cabinet and a band of windows.
+   --nightness (0 = day, 1 = night) follows the user's local time. */
+
+.scene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: radial-gradient(130% 100% at 40% 25%, #eceef1 0%, #d8dade 55%, #c2c5cc 100%);
+  perspective: 1100px;
+}
+
+/* Seat-class accents (used for piping/trim) */
+.scene.economy  { --accent: #c8344a; }
+.scene.business { --accent: #b9933e; }
+.scene.first    { --accent: #c0392b; }
+
+/* ===================================================================
+   SIDE WALL — fuselage wall on the left, angled away toward the front.
+   The right edge fades out via mask so it never cuts off abruptly.
+   =================================================================== */
+.side-wall {
+  position: absolute;
+  left: -1.5%;
+  top: 0;
+  width: 38%;
+  height: 94%;
+  transform-origin: left center;
+  transform: rotateY(48deg);
+  background: linear-gradient(to right, #dcdee2 0%, #cdd0d6 75%, #c3c6cd 100%);
+  -webkit-mask: linear-gradient(to right, black 82%, transparent 100%);
+  mask: linear-gradient(to right, black 82%, transparent 100%);
+  z-index: 1;
+}
+.scene.business .side-wall {
+  background: linear-gradient(to right, #ece4d0 0%, #e0d6bf 75%, #d6cab0 100%);
+}
+/* gold accent lines on the left wall too (thick + thin = hierarchy),
+   running between the two windows */
+.scene.business .side-wall::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent calc(44% - 2px), rgba(200, 166, 120, 0.55) calc(44% - 2px) calc(44% + 1px), transparent calc(44% + 1px)),
+    linear-gradient(90deg, transparent calc(47.5% - 1px), rgba(200, 166, 120, 0.35) calc(47.5% - 1px) 47.5%, transparent 47.5%);
+  pointer-events: none;
+}
+.scene.first .side-wall {
+  background: linear-gradient(to right, #faf7f2 0%, #f1ece1 75%, #e7e0d3 100%);
+}
+/* horizontal gold trim above the window band: starts over the leftmost
+   window and runs past the last one, fading out with the wall */
+.scene.first .side-wall::after {
+  content: "";
+  position: absolute;
+  top: 11%;
+  left: 5%;
+  right: 1%;
+  height: 3px;
+  border-radius: 3px;
+  background: linear-gradient(to right,
+    rgba(200, 160, 80, 0) 0%, rgba(200, 160, 80, 0.75) 5%,
+    rgba(200, 160, 80, 0.75) 92%, rgba(200, 160, 80, 0.25) 100%);
+  box-shadow: 0 1px 3px rgba(200, 160, 80, 0.3);
+  pointer-events: none;
+}
+
+/* ---- Windows: rounded-square portholes, thick recessed bezels ---- */
+.window-unit {
+  position: absolute;
+  top: 14%;
+  aspect-ratio: 0.78;
+  z-index: 1;
+}
+/* two windows for economy/business, three smaller for first */
+.scene.economy .window-unit,
+.scene.business .window-unit { width: 30%; }
+.scene.economy .window-unit.w0, .scene.business .window-unit.w0 { left: 9%; }
+.scene.economy .window-unit.w1, .scene.business .window-unit.w1 { left: 52%; }
+.scene.first .window-unit { width: 24%; top: 16%; }
+.scene.first .window-unit.w0 { left: 6%; }
+.scene.first .window-unit.w1 { left: 37%; }
+.scene.first .window-unit.w2 { left: 68%; }
+
+/* recessed surround — soft, blurred ring so nothing ends in a hard line */
+.window-unit::before {
+  content: "";
+  position: absolute;
+  inset: -9%;
+  border-radius: 32% / 28%;
+  background: rgba(0, 0, 0, 0.10);
+  filter: blur(6px);
+}
+.window-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 32% / 28%;
+  box-shadow: 0 0 60px 22px rgba(255, 195, 130, 0.30);
+  opacity: var(--nightness, 0);
+  transition: opacity 2s linear;
+  pointer-events: none;
+}
+.window-sky {
+  position: absolute;
+  inset: 0;
+  border-radius: 32% / 28%;
+  border: 11px solid #eef0f2;
+  overflow: hidden;
+  background: linear-gradient(to bottom, #6fb6dd 0%, #a8d4ec 45%, #dceef7 75%, #eef7fb 100%);
+  box-shadow:
+    inset 0 0 26px rgba(10, 25, 50, 0.35),
+    inset 0 3px 8px rgba(255, 255, 255, 0.3),
+    0 2px 10px rgba(0, 0, 0, 0.18);
+}
+/* business: thick wood bezel matching the console, warm reflection on the
+   lower inner edge (cabin light bouncing off the frame) */
+.scene.business .window-sky {
+  border: 13px solid #8a6648;
+  box-shadow:
+    inset 0 0 26px rgba(10, 25, 50, 0.35),
+    inset 0 -8px 14px rgba(255, 200, 130, 0.30),
+    0 2px 10px rgba(0, 0, 0, 0.18);
+}
+/* darker outer reveal ring for frame depth */
+.scene.business .window-unit::after {
+  content: "";
+  position: absolute;
+  inset: -7.5%;
+  border-radius: 34% / 30%;
+  border: 5px solid rgba(105, 76, 52, 0.55);
+  box-shadow: inset 0 2px 6px rgba(255, 255, 255, 0.12);
+  pointer-events: none;
+}
+/* electrochromic shade-control buttons below each window */
+.shade-dots {
+  position: absolute;
+  bottom: -13%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 7px;
+}
+.shade-dots i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #c8a678;
+  box-shadow: 0 0 6px rgba(218, 170, 90, 0.85);
+  opacity: calc(0.55 + var(--nightness, 0) * 0.45);
+  transition: opacity 2s linear;
+}
+/* first: deep molded reveals — thick warm-white surround set into the
+   fuselage, with an inner shadow for depth */
+.scene.first .window-sky {
+  border: 18px solid #f6f1e6;
+  box-shadow:
+    inset 0 0 26px rgba(10, 25, 50, 0.32),
+    inset 0 5px 12px rgba(60, 50, 35, 0.20),
+    0 2px 10px rgba(0, 0, 0, 0.12);
+}
+.scene.first .window-unit::after {
+  content: "";
+  position: absolute;
+  inset: -8%;
+  border-radius: 34% / 30%;
+  border: 6px solid rgba(196, 187, 168, 0.55);
+  box-shadow: inset 0 3px 8px rgba(255, 255, 255, 0.35);
+  pointer-events: none;
+}
+/* lamp glow faintly reflected on the lower rim of the nearest window */
+.scene.first .window-unit.w0 .window-sky {
+  box-shadow:
+    inset 0 0 26px rgba(10, 25, 50, 0.32),
+    inset 0 5px 12px rgba(60, 50, 35, 0.20),
+    inset 0 -8px 14px rgba(255, 205, 140, 0.22),
+    0 2px 10px rgba(0, 0, 0, 0.12);
+}
+/* shade controls: ivory dots, the middle one active amber */
+.scene.first .shade-dots i {
+  background: #d9d4c6;
+  box-shadow: none;
+  opacity: 0.7;
+}
+.scene.first .shade-dots i:nth-child(2) {
+  background: #e0a84f;
+  box-shadow: 0 0 6px rgba(224, 168, 79, 0.9);
+  opacity: 1;
+}
+
+.window-sky .night {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, #060b1d 0%, #101c3a 55%, #2c3a60 100%);
+  opacity: var(--nightness, 0);
+  transition: opacity 2s linear;
+  z-index: 1;
+}
+.window-sky .stars {
+  position: absolute;
+  width: 2px; height: 2px;
+  border-radius: 50%;
+  background: #fff;
+  top: 12%; left: 20%;
+  box-shadow:
+    34px 18px 0 0 #fff, 90px 4px 0 0 rgba(255,255,255,.8), 150px 30px 0 0 #fff,
+    60px 60px 0 0 rgba(255,255,255,.9), 130px 80px 0 0 #fff,
+    20px 100px 0 0 rgba(255,255,255,.8), 100px 140px 0 0 rgba(255,255,255,.7),
+    170px 120px 0 0 rgba(255,255,255,.9), 190px 64px 0 0 rgba(255,255,255,.6);
+  opacity: calc(var(--nightness, 0) * 0.9);
+  transition: opacity 2s linear;
+  z-index: 2;
+}
+.cloud {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 999px;
+  filter: blur(2px);
+  animation: drift linear infinite;
+  z-index: 3;
+}
+@keyframes drift {
+  from { transform: translateX(320px); }
+  to   { transform: translateX(-320px); }
+}
+.window-sky .cloud { opacity: calc(1 - var(--nightness, 0) * 0.65); }
+
+svg.wing {
+  position: absolute;
+  left: -2%;
+  bottom: 8%;
+  width: 104%;
+  height: 40%;
+  filter: brightness(calc(1 - var(--nightness, 0) * 0.55));
+  transition: filter 2s linear;
+  z-index: 4;
+}
+svg.wing .navlight {
+  opacity: var(--nightness, 0);
+  animation: blink 2.4s steps(1) infinite;
+}
+@keyframes blink { 0%, 72% { visibility: visible; } 73%, 100% { visibility: hidden; } }
+
+/* ===================================================================
+   ECONOMY — the seatback of the row ahead (reference: blue fabric top,
+   gray plastic shell, life-vest sticker), your laptop on its open tray.
+   =================================================================== */
+.economy-seatback {
+  position: absolute;
+  left: 42%;
+  right: 3%;
+  top: 5%;
+  bottom: 0;
+  border-radius: 36px 36px 0 0;
+  background:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 4px),
+    linear-gradient(to bottom, #3354a8 0%, #27418a 38%, #1f3470 47%,
+                                #cdd0d5 47.5%, #c2c5cb 78%, #b4b7be 100%);
+  box-shadow:
+    inset 0 14px 24px rgba(255, 255, 255, 0.10),
+    inset 0 -10px 30px rgba(0, 0, 0, 0.12),
+    -16px 8px 38px rgba(0, 0, 0, 0.22);
+  filter: brightness(calc(1 - var(--nightness, 0) * 0.3));
+  transition: filter 2s linear;
+  z-index: 2;
+}
+/* life-vest sticker (reference detail) */
+.economy-seatback::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 14%;
+  right: 14%;
+  height: 6.5%;
+  border-radius: 8px;
+  background:
+    repeating-linear-gradient(to bottom, transparent 0 26%, rgba(90, 100, 112, 0.5) 26% 36%,
+      transparent 36% 62%, rgba(90, 100, 112, 0.35) 62% 72%, transparent 72% 100%) ,
+    #dfe2e6;
+  background-blend-mode: normal;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+/* tray latch */
+.economy-seatback::after {
+  content: "";
+  position: absolute;
+  top: 60%;
+  left: 47%;
+  width: 6%;
+  height: 2.4%;
+  border-radius: 4px;
+  background: #9da1a8;
+  box-shadow: inset 0 -2px 3px rgba(0, 0, 0, 0.25);
+}
+
+/* ===================================================================
+   BUSINESS — Emirates-style pod: champagne shell, wood console,
+   minibar bottles, quilted cream leather.
+   =================================================================== */
+.scene.business {
+  background: radial-gradient(130% 100% at 40% 25%, #efe8d6 0%, #e2d8c2 55%, #d2c6ab 100%);
+}
+/* atmosphere: overhead amber mood lighting along the ceiling line, soft
+   corner vignettes (intimacy), and a warm key light from the upper right */
+.scene.business::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(to bottom, rgba(214, 160, 80, 0.20) 0%, transparent 16%),
+    radial-gradient(50% 38% at 0% 0%, rgba(40, 28, 16, 0.16), transparent 70%),
+    radial-gradient(50% 38% at 100% 0%, rgba(40, 28, 16, 0.10), transparent 70%),
+    radial-gradient(75% 55% at 88% 0%, rgba(255, 210, 140, 0.16), transparent 65%);
+  z-index: 5;
+}
+.pod-shell {
+  position: absolute;
+  right: -8%;
+  top: -4%;
+  width: 58%;
+  height: 108%;
+  border-radius: 44% 0 0 40% / 50% 0 0 46%;
+  background: linear-gradient(115deg, #ddd2b8 0%, #e9dfc9 45%, #d4c8ab 100%);
+  box-shadow:
+    inset 18px 0 40px rgba(255, 255, 255, 0.28),
+    inset -30px 0 50px rgba(0, 0, 0, 0.10),
+    -24px 0 50px rgba(0, 0, 0, 0.16);
+  filter: brightness(calc(1 - var(--nightness, 0) * 0.3));
+  transition: filter 2s linear;
+  z-index: 2;
+}
+/* bronze trim following the shell curve (thick line of the pair) */
+.pod-shell::before {
+  content: "";
+  position: absolute;
+  inset: 3% 0 3% 2.5%;
+  border-radius: 44% 0 0 40% / 50% 0 0 46%;
+  border-left: 3px solid rgba(185, 147, 62, 0.65);
+}
+/* thinner companion line for hierarchy */
+.pod-shell::after {
+  content: "";
+  position: absolute;
+  inset: 7% 0 7% 7%;
+  border-radius: 44% 0 0 40% / 50% 0 0 46%;
+  border-left: 1.5px solid rgba(185, 147, 62, 0.38);
+}
+
+/* minibar shelf with little bottles (reference detail) */
+.minibar {
+  position: absolute;
+  left: 29.5%;
+  bottom: 21.8%;
+  width: 10.5%;
+  height: 8%;
+  display: flex;
+  align-items: flex-end;
+  gap: 14%;
+  padding: 0 6%;
+  z-index: 5;
+}
+.minibar i {
+  flex: 1;
+  border-radius: 3px 3px 2px 2px;
+  position: relative;
+  box-shadow:
+    inset 1px 0 2px rgba(255, 255, 255, 0.4),
+    0 3px 8px rgba(0, 0, 0, 0.35);
+  filter: brightness(calc(1 - var(--nightness, 0) * 0.25));
+  transition: filter 2s linear;
+}
+.minibar i::before { /* bottle neck */
+  content: "";
+  position: absolute;
+  top: -26%;
+  left: 36%;
+  width: 28%;
+  height: 28%;
+  border-radius: 2px 2px 0 0;
+  background: inherit;
+}
+.minibar i:nth-child(1) { height: 86%; background: #b67f33; }
+.minibar i:nth-child(2) { height: 100%; background: #4e7a4a; }
+.minibar i:nth-child(3) { height: 72%; background: #9db4c8; }
+
+/* ===================================================================
+   FIRST — bright white suite: ottoman with red pillow ahead, lamp
+   cabinet by the window, white desk (references/first-class.webp).
+   =================================================================== */
+.scene.first {
+  /* warm ivory toning replaces the flat white */
+  background: radial-gradient(130% 100% at 40% 25%, #faf7f2 0%, #f0ebe1 55%, #ded7c9 100%);
+}
+/* atmosphere: the lamp is the hero — warmer toward the left, cooler toward
+   the right — plus the floor-to-ceiling panel seam with brass hairline
+   between the window zone and the console zone */
+.scene.first::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(58% 70% at 28% 52%, rgba(255, 205, 135, 0.16), transparent 62%),
+    linear-gradient(to left, rgba(165, 182, 205, 0.12), transparent 38%);
+  z-index: 5;
+}
+/* the side wall fades out only AFTER the last window */
+.scene.first .side-wall {
+  -webkit-mask: linear-gradient(to right, black 93%, transparent 100%);
+  mask: linear-gradient(to right, black 93%, transparent 100%);
+}
+.suite-wall {
+  position: absolute;
+  left: 24%;
+  right: 0;
+  top: 0;
+  height: 76%;
+  background: linear-gradient(to bottom, #faf7f2 0%, #f0ebe1 75%, #e3dccd 100%);
+  -webkit-mask: linear-gradient(to right, transparent 0%, black 9%);
+  mask: linear-gradient(to right, transparent 0%, black 9%);
+  box-shadow: inset 0 -18px 30px rgba(0, 0, 0, 0.06);
+  filter: brightness(calc(1 - var(--nightness, 0) * 0.3));
+  transition: filter 2s linear;
+  z-index: 1;
+}
+/* panel seam + brass hairline, placed just past the last window; lives on
+   the wall layer so furniture sits in front of it */
+.suite-wall::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent calc(15% - 1px), rgba(70, 60, 45, 0.10) 15%, transparent calc(15% + 1px)),
+    linear-gradient(90deg, transparent calc(15% + 2px), rgba(200, 160, 80, 0.55) calc(15% + 2px) calc(15% + 3px), transparent calc(15% + 3px));
+}
+/* suite partition: a deliberate structural divider, not a hairline —
+   shaded edge + highlight so it reads as a real panel join */
+.suite-wall::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg,
+      transparent calc(50% - 4px),
+      rgba(60, 52, 40, 0.10) calc(50% - 4px) calc(50% - 1px),
+      rgba(60, 52, 40, 0.18) calc(50% - 1px) 50%,
+      rgba(255, 255, 255, 0.55) 50% calc(50% + 1.5px),
+      transparent calc(50% + 1.5px));
+}
+
+/* diamond-tufted ivory leather sofa with visible stitch lines */
+.ottoman {
+  position: absolute;
+  right: 5%;
+  bottom: 12%;
+  width: 28%;
+  height: 15%;
+  border-radius: 22px 22px 10px 10px;
+  background:
+    repeating-linear-gradient(45deg,
+      rgba(150, 140, 118, 0.30) 0 1.5px, rgba(255, 255, 255, 0.30) 1.5px 4.5px,
+      transparent 4.5px 19px, rgba(120, 112, 95, 0.10) 19px 26px),
+    repeating-linear-gradient(-45deg,
+      rgba(150, 140, 118, 0.30) 0 1.5px, rgba(255, 255, 255, 0.30) 1.5px 4.5px,
+      transparent 4.5px 19px, rgba(120, 112, 95, 0.10) 19px 26px),
+    linear-gradient(to bottom, #efece4 0%, #d9d5ca 70%, #c6c1b4 100%);
+  box-shadow:
+    inset 0 8px 14px rgba(255, 255, 255, 0.4),
+    0 12px 30px rgba(0, 0, 0, 0.18),
+    0 20px 24px -8px rgba(60, 52, 40, 0.30); /* grounding floor shadow */
+  filter: brightness(calc(1 - var(--nightness, 0) * 0.3));
+  transition: filter 2s linear;
+  z-index: 3;
+}
+/* folded cashmere throw draped over the right arm */
+.ottoman::before {
+  content: "";
+  position: absolute;
+  right: 2%;
+  top: -16%;
+  width: 26%;
+  height: 86%;
+  border-radius: 10px 10px 14px 14px;
+  background:
+    repeating-linear-gradient(to bottom,
+      transparent 0 22%, rgba(120, 100, 70, 0.14) 22% 25%, transparent 25% 47%,
+      rgba(120, 100, 70, 0.12) 47% 50%, transparent 50% 100%),
+    linear-gradient(to bottom, #ddcbab 0%, #cdb893 100%);
+  box-shadow: -6px 8px 14px rgba(60, 52, 40, 0.18);
+  transform: rotate(1.5deg);
+}
+/* slim accent pillow with embroidered border stitch */
+.ottoman .pillow {
+  position: absolute;
+  top: -28%;
+  right: 34%;
+  width: 38%;
+  height: 48%;
+  border-radius: 10px;
+  transform: rotate(-6deg);
+  background:
+    linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.25) 47%, transparent 60%),
+    linear-gradient(to bottom, #c74a3c 0%, #a73428 100%);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.22);
+}
+.ottoman .pillow::before {
+  content: "";
+  position: absolute;
+  inset: 8%;
+  border: 1px dashed rgba(255, 235, 215, 0.6);
+  border-radius: 7px;
+}
+
+.cabinet {
+  position: absolute;
+  left: 24%;
+  bottom: 12%;
+  width: 13%;
+  height: 21%;
+  border-radius: 12px 12px 4px 4px;
+  background: linear-gradient(to bottom, #f4f1ea 0%, #e4dfd3 80%, #d6d0c2 100%);
+  box-shadow:
+    inset 0 2px 5px rgba(255, 255, 255, 0.6),
+    0 10px 26px rgba(0, 0, 0, 0.15),
+    0 18px 20px -8px rgba(60, 52, 40, 0.28); /* grounding floor shadow */
+  filter: brightness(calc(1 - var(--nightness, 0) * 0.3));
+  transition: filter 2s linear;
+  z-index: 4;
+}
+.cabinet::before { /* drawer seam */
+  content: "";
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  top: 46%;
+  height: 2px;
+  background: rgba(0, 0, 0, 0.08);
+}
+/* light marble veneer top */
+.cabinet::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -2%;
+  right: -2%;
+  height: 11%;
+  border-radius: 6px;
+  background:
+    linear-gradient(105deg, transparent 18%, rgba(175, 168, 152, 0.35) 19%, transparent 21%,
+      transparent 48%, rgba(175, 168, 152, 0.25) 49.5%, transparent 52%,
+      transparent 74%, rgba(175, 168, 152, 0.3) 75%, transparent 77%),
+    linear-gradient(to bottom, #f6f4ee 0%, #e9e6dd 100%);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+}
+
+/* serving tray on the cabinet: flute + welcome card + bud vase live on it */
+.table-tray {
+  position: absolute;
+  left: 29.6%;
+  bottom: 32.4%;
+  width: 7.6%;
+  height: 1.5%;
+  border-radius: 5px;
+  background: #f4efe4;
+  border: 1px solid rgba(200, 160, 80, 0.55); /* brass rim */
+  box-shadow: -7px 4px 8px rgba(60, 52, 40, 0.20);
+  z-index: 5;
+}
+.welcome-card {
+  position: absolute;
+  left: 32.6%;
+  bottom: 33.4%;
+  width: 2.5%;
+  height: 3.2%;
+  border-radius: 2px;
+  background: linear-gradient(to bottom, #ffffff 0%, rgba(0, 0, 0, 0.05) 12%, #faf6ec 13%, #efe9d8 100%);
+  transform: rotate(-4deg);
+  box-shadow: -5px 4px 7px rgba(60, 52, 40, 0.18);
+  z-index: 6;
+}
+.welcome-card::before {
+  content: "";
+  position: absolute;
+  left: 22%;
+  right: 22%;
+  top: 45%;
+  height: 1.5px;
+  background: rgba(150, 130, 95, 0.5);
+  box-shadow: 0 5px 0 rgba(150, 130, 95, 0.35);
+}
+.bud-vase {
+  position: absolute;
+  left: 35.4%;
+  bottom: 33.4%;
+  width: 1.1%;
+  min-width: 9px;
+  height: 2.8%;
+  border-radius: 3px 3px 5px 5px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.75), rgba(225, 222, 212, 0.85));
+  box-shadow: -4px 3px 6px rgba(60, 52, 40, 0.16);
+  z-index: 6;
+}
+.bud-vase .vstem {
+  position: absolute;
+  bottom: 90%;
+  left: 46%;
+  width: 1.5px;
+  height: 130%;
+  background: #7d9460;
+}
+.bud-vase .bloom {
+  position: absolute;
+  bottom: 205%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 7px;
+  height: 7px;
+  border-radius: 50% 50% 50% 0;
+  background: radial-gradient(circle at 35% 35%, #ffffff 0%, #f1edda 70%, #e3dcc2 100%);
+  box-shadow: 0 1px 3px rgba(60, 52, 40, 0.25);
+}
+
+/* table lamp (first class, on the cabinet) — the scene's hero light */
+.side-lamp {
+  position: absolute;
+  left: 24.3%;
+  bottom: 32.5%;
+  width: 6%;
+  height: 15%;
+  z-index: 5;
+}
+/* warm cone of light falling from the shade onto the marble */
+.side-lamp::after {
+  content: "";
+  position: absolute;
+  top: 34%;
+  left: -28%;
+  right: -28%;
+  height: 70%;
+  background: linear-gradient(to bottom, rgba(255, 200, 120, 0.30), transparent 90%);
+  clip-path: polygon(34% 0, 66% 0, 100% 100%, 0 100%);
+  opacity: calc(0.45 + var(--nightness, 0) * 0.55);
+  transition: opacity 2s linear;
+  pointer-events: none;
+}
+/* soft pool of light on the surface below */
+.side-lamp::before {
+  content: "";
+  position: absolute;
+  bottom: -4%;
+  left: -42%;
+  right: -42%;
+  height: 11%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(255, 210, 135, 0.45) 0%, transparent 70%);
+  filter: blur(2px);
+  opacity: calc(0.5 + var(--nightness, 0) * 0.5);
+  transition: opacity 2s linear;
+  pointer-events: none;
+}
+.side-lamp .shade {
+  position: absolute;
+  top: 0; left: 12%; right: 12%;
+  height: 38%;
+  background: linear-gradient(to bottom, #f7f3e8, #e7dfc9);
+  clip-path: polygon(18% 0, 82% 0, 100% 100%, 0 100%);
+}
+.side-lamp .stem {
+  position: absolute;
+  top: 38%; left: 48%;
+  width: 4%; min-width: 2px;
+  height: 54%;
+  background: #b5934e; /* brass */
+}
+.side-lamp .lbase {
+  position: absolute;
+  bottom: 0; left: 24%;
+  width: 52%; height: 8%;
+  border-radius: 50%;
+  background: #a39d8c;
+}
+.side-lamp .glow {
+  position: absolute;
+  top: -45%; left: -65%;
+  width: 230%; height: 140%;
+  background: radial-gradient(circle, rgba(255, 214, 140, 0.5) 0%, transparent 65%);
+  opacity: calc(0.08 + var(--nightness, 0) * 0.85);
+  transition: opacity 2s linear;
+  pointer-events: none;
+}
+
+/* ===================================================================
+   SHARED FOREGROUND — your seat, the work surface, the laptop.
+   =================================================================== */
+.my-seat {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 12%;
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.04) 0 2px, transparent 2px 60px),
+    linear-gradient(to bottom, #33549f 0%, #21386f 100%);
+  border-radius: 48px 48px 0 0;
+  box-shadow:
+    inset 0 12px 20px rgba(255, 255, 255, 0.09),
+    0 -10px 34px rgba(0, 0, 0, 0.30);
+  filter: brightness(calc(1 - var(--nightness, 0) * 0.3));
+  transition: filter 2s linear;
+  z-index: 3;
+}
+.my-seat::before {
+  content: "";
+  position: absolute;
+  top: 7px;
+  left: 4%;
+  right: 4%;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--accent);
+  opacity: 0.75;
+}
+/* quilted cream leather (business reference): each stitch line gets a
+   highlight beside it and a shadow falling into the diamond, so the
+   quilting reads as padded leather rather than a flat pattern */
+.scene.business .my-seat {
+  background:
+    repeating-linear-gradient(45deg,
+      rgba(110, 85, 45, 0.30) 0 1.5px, rgba(255, 255, 255, 0.12) 1.5px 5px,
+      transparent 5px 21px, rgba(90, 70, 40, 0.12) 21px 30px),
+    repeating-linear-gradient(-45deg,
+      rgba(110, 85, 45, 0.30) 0 1.5px, rgba(255, 255, 255, 0.12) 1.5px 5px,
+      transparent 5px 21px, rgba(90, 70, 40, 0.12) 21px 30px),
+    linear-gradient(to bottom, #ecdfc3 0%, #d6c5a2 100%);
+}
+/* gold trim strip where the quilting meets the console edge */
+.scene.business .my-seat::before {
+  height: 4px;
+  background: #C8A678;
+  opacity: 0.9;
+}
+/* pale leather (first reference) */
+.scene.first .my-seat {
+  background:
+    linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, 0.4) 42%, transparent 55%),
+    linear-gradient(to bottom, #e3e5e8 0%, #c6c9cf 100%);
+}
+
+.armrest {
+  position: absolute;
+  bottom: 9.5%;
+  width: 16%;
+  height: 4.5%;
+  background: linear-gradient(to bottom, #434b59 0%, #272c36 100%);
+  border-radius: 14px 14px 5px 5px;
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.35);
+  filter: brightness(calc(1 - var(--nightness, 0) * 0.3));
+  transition: filter 2s linear;
+  z-index: 4;
+}
+.armrest.left { left: 2.5%; }
+.armrest.right { right: 2.5%; }
+
+/* the surface the laptop sits on — tray / wood console / white desk */
+.work-surface {
+  position: absolute;
+  bottom: 12%;
+  height: 9%;
+  border-radius: 14px;
+  box-shadow:
+    0 10px 26px rgba(0, 0, 0, 0.30),
+    inset 0 2px 4px rgba(255, 255, 255, 0.30);
+  filter: brightness(calc(1 - var(--nightness, 0) * 0.3));
+  transition: filter 2s linear;
+  z-index: 4;
+}
+/* economy: gray plastic tray folded down from the seatback ahead */
+.scene.economy .work-surface {
+  left: 45%;
+  right: 6%;
+  background: linear-gradient(to bottom, #c3c6cc 0%, #aaadb4 60%, #989ba2 100%);
+}
+.scene.economy .work-surface::after { /* cup recess (reference detail) */
+  content: "";
+  position: absolute;
+  right: 7%;
+  top: 22%;
+  width: 9%;
+  aspect-ratio: 1;
+  max-height: 60%;
+  border-radius: 50%;
+  background: radial-gradient(circle, #8e9198 30%, #a4a7ae 70%);
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+/* business: wood-grain console (reference detail) */
+.scene.business .work-surface {
+  left: 28%;
+  right: 0;
+  height: 10%;
+  border-radius: 18px 0 0 8px;
+  background:
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.28) 0 3px, transparent 3px),
+    repeating-linear-gradient(92deg, #8a6648 0 16px, #7d5c42 16px 28px, #93704e 28px 49px);
+}
+/* inlaid brass border along the console's front edge */
+.scene.business .work-surface::before {
+  content: "";
+  position: absolute;
+  top: 5px;
+  left: 1.8%;
+  right: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: #C8A678;
+  opacity: 0.8;
+}
+/* first: clean ivory desk with inlaid gold edge */
+.scene.first .work-surface {
+  left: 40%;
+  right: 9%;
+  background: linear-gradient(to bottom, #f6f3ec 0%, #e5e1d6 70%, #d5d0c2 100%);
+}
+.scene.first .work-surface::before {
+  content: "";
+  position: absolute;
+  top: 5px;
+  left: 2%;
+  right: 2%;
+  height: 1.5px;
+  border-radius: 2px;
+  background: #C8A050;
+  opacity: 0.6;
+}
+/* laptop screen glow spilling onto the desk (matches business) */
+.scene.first .laptop::after {
+  content: "";
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  bottom: -10%;
+  height: 16%;
+  border-radius: 50%;
+  background: linear-gradient(to bottom, rgba(215, 232, 255, 0.34), rgba(215, 232, 255, 0.04));
+  filter: blur(5px);
+  opacity: calc(0.4 + var(--nightness, 0) * 0.5);
+  transition: opacity 2s linear;
+  pointer-events: none;
+}
+
+.laptop {
+  position: absolute;
+  bottom: 19%;
+  left: 60%;
+  transform: translateX(-50%);
+  width: 28%;
+  max-width: 400px;
+  aspect-ratio: 16 / 10.5;
+  z-index: 5;
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.35));
+}
+/* business: warm key light from upper right → shadow falls left */
+.scene.business .laptop {
+  left: 58%;
+  filter: drop-shadow(-16px 13px 22px rgba(40, 28, 16, 0.38));
+}
+/* laptop screen glow spilling onto the wood in front of the keyboard */
+.scene.business .laptop::after {
+  content: "";
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  bottom: -10%;
+  height: 16%;
+  border-radius: 50%;
+  background: linear-gradient(to bottom, rgba(215, 232, 255, 0.34), rgba(215, 232, 255, 0.04));
+  filter: blur(5px);
+  opacity: calc(0.4 + var(--nightness, 0) * 0.5);
+  transition: opacity 2s linear;
+  pointer-events: none;
+}
+.scene.first .laptop { left: 60%; bottom: 19.5%; }
+.laptop .lid {
+  position: absolute;
+  inset: 0 0 9% 0;
+  background: #1d2127;
+  border-radius: 10px 10px 0 0;
+  border: 3px solid #14171c;
+  padding: 3.2%;
+}
+.laptop .base {
+  position: absolute;
+  bottom: 0;
+  left: -3.5%;
+  right: -3.5%;
+  height: 10%;
+  background: linear-gradient(to bottom, #3a3f47, #2a2e35);
+  border-radius: 3px 3px 12px 12px;
+}
+.doc {
+  width: 100%;
+  height: 100%;
+  background: #f7f9fc;
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 26px rgba(150, 185, 255, calc(0.1 + var(--nightness, 0) * 0.3));
+}
+.doc-bar {
+  flex: 0 0 13%;
+  background: #e3e8ef;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 9px;
+}
+.doc-bar i { width: 7px; height: 7px; border-radius: 50%; }
+.doc-bar i:nth-child(1) { background: #e2574c; }
+.doc-bar i:nth-child(2) { background: #f5b942; }
+.doc-bar i:nth-child(3) { background: #4caf7d; }
+.doc-bar span {
+  margin-left: 7px;
+  font-size: 10px;
+  color: #7c8794;
+  font-family: Menlo, monospace;
+}
+.doc-page {
+  flex: 1;
+  padding: 6% 9%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+.doc-page .line { height: 5.5%; min-height: 3px; border-radius: 2px; background: #c5d0dd; }
+.doc-page .line:nth-child(1) { width: 46%; background: #8da4bd; height: 8%; }
+.doc-page .line:nth-child(2) { width: 92%; }
+.doc-page .line:nth-child(3) { width: 86%; }
+.doc-page .line:nth-child(4) { width: 95%; }
+.doc-page .line:nth-child(5) { width: 71%; }
+.doc-page .line:nth-child(6) { width: 88%; }
+.doc-page .line:nth-child(7) { width: 38%; position: relative; }
+.doc-page .line:last-child::after {
+  content: "";
+  position: absolute;
+  right: -7px;
+  top: -30%;
+  width: 2px;
+  height: 160%;
+  background: #3b6ea5;
+  animation: caret 1.1s steps(1) infinite;
+}
+@keyframes caret { 50% { opacity: 0; } }
+
+/* water glass (business) */
+.tumbler {
+  position: absolute;
+  right: 22%;
+  bottom: 22.8%;
+  width: 2.4%;
+  min-width: 18px;
+  height: 5.5%;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-top-width: 1px;
+  border-radius: 3px 3px 7px 7px;
+  background: linear-gradient(to top, rgba(168, 212, 236, 0.55) 55%, transparent 55%);
+  z-index: 5;
+}
+/* linen coaster under the glass, stitched edge, shadow cast leftward */
+.coaster {
+  position: absolute;
+  right: 20.8%;
+  bottom: 22.3%;
+  width: 4.8%;
+  height: 1.8%;
+  border-radius: 50%;
+  background: #ede3cd;
+  border: 1px dashed #c2ad85;
+  box-shadow:
+    -10px 5px 10px rgba(40, 28, 16, 0.25),
+    inset 0 1px 2px rgba(255, 255, 255, 0.6);
+  z-index: 4;
+}
+/* folded cream menu card on the console, left of the laptop */
+.menu-card {
+  position: absolute;
+  left: 40.5%;
+  bottom: 22.4%;
+  width: 3.6%;
+  height: 5.4%;
+  border-radius: 2px;
+  background: linear-gradient(to bottom, #f8f1e1 0%, rgba(0, 0, 0, 0.06) 12%, #f1e8d3 13%, #e6dabf 100%);
+  transform: rotate(-3deg);
+  box-shadow: -9px 7px 11px rgba(40, 28, 16, 0.26);
+  z-index: 5;
+}
+.menu-card::before {
+  /* two faint printed lines */
+  content: "";
+  position: absolute;
+  left: 20%;
+  right: 20%;
+  top: 42%;
+  height: 2px;
+  background: rgba(150, 130, 95, 0.55);
+  box-shadow: 0 7px 0 rgba(150, 130, 95, 0.38);
+}
+
+/* champagne flute with rising bubbles (first), on the serving tray */
+.flute {
+  position: absolute;
+  left: 30.8%;
+  bottom: 33.2%;
+  width: 1.5%;
+  min-width: 12px;
+  height: 7.5%;
+  z-index: 6;
+}
+/* condensation ring on the tray beneath the glass */
+.flute::after {
+  content: "";
+  position: absolute;
+  bottom: -4%;
+  left: -22%;
+  right: -22%;
+  height: 7%;
+  border-radius: 50%;
+  border: 1px solid rgba(200, 210, 218, 0.55);
+  background: rgba(225, 235, 242, 0.25);
+}
+.flute .bowl {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 52%;
+  border: 1.5px solid rgba(180, 180, 185, 0.75);
+  border-radius: 4px 4px 9px 9px;
+  /* faint golden fill — suggestion of the liquid, not a paint bucket */
+  background: linear-gradient(to top, rgba(241, 207, 126, 0.5) 72%, transparent 72%);
+  overflow: hidden;
+}
+.flute .fstem {
+  position: absolute;
+  top: 52%; left: 44%;
+  width: 12%; min-width: 2px;
+  height: 36%;
+  background: rgba(160, 160, 168, 0.75);
+}
+.flute .fbase {
+  position: absolute;
+  bottom: 0; left: 8%;
+  width: 84%; height: 5%;
+  min-height: 2px;
+  border-radius: 50%;
+  background: rgba(160, 160, 168, 0.8);
+}
+.flute .bubble {
+  position: absolute;
+  bottom: 4%;
+  width: 2px; height: 2px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  animation: bubble-rise 2.6s linear infinite;
+}
+.flute .bubble.b1 { left: 28%; animation-delay: 0s; }
+.flute .bubble.b2 { left: 52%; animation-delay: 0.9s; }
+.flute .bubble.b3 { left: 70%; animation-delay: 1.7s; }
+@keyframes bubble-rise {
+  from { transform: translateY(0); opacity: 0.9; }
+  to   { transform: translateY(-26px); opacity: 0; }
+}
+
+/* ---- Cabin lights low at night: soft dusk wash ---- */
+.scene::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(150deg, #161330 45%, #2c1a42 100%);
+  opacity: calc(var(--nightness, 0) * 0.5);
+  pointer-events: none;
+  transition: opacity 2s linear;
+  z-index: 6;
+}
+/* overlays stay above the night wash */
+.flight-controls, .route-progress, .audio-dock, .paused-veil, .modal-backdrop { z-index: 10; }

@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 200" width="640" height="200">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0a0f"/>
+      <stop offset="100%" style="stop-color:#12121a"/>
+    </linearGradient>
+    <linearGradient id="arcGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#4a4a6a;stop-opacity:0"/>
+      <stop offset="40%" style="stop-color:#8a7abf;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#4a4a6a;stop-opacity:0.3"/>
+    </linearGradient>
+    <linearGradient id="planeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff"/>
+      <stop offset="100%" style="stop-color:#c8b8f0"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="640" height="200" rx="16" fill="url(#bgGrad)"/>
+
+  <!-- Subtle grid lines -->
+  <line x1="0" y1="100" x2="640" y2="100" stroke="#ffffff" stroke-width="0.3" stroke-opacity="0.04"/>
+  <line x1="320" y1="0" x2="320" y2="200" stroke="#ffffff" stroke-width="0.3" stroke-opacity="0.04"/>
+
+  <!-- Flight arc path (dashed) -->
+  <path d="M 80 140 Q 320 30 560 130"
+        fill="none"
+        stroke="url(#arcGrad)"
+        stroke-width="1.5"
+        stroke-dasharray="6 5"
+        stroke-linecap="round"/>
+
+  <!-- Arc glow -->
+  <path d="M 80 140 Q 320 30 560 130"
+        fill="none"
+        stroke="#9080d0"
+        stroke-width="3"
+        stroke-opacity="0.12"
+        stroke-dasharray="6 5"/>
+
+  <!-- Departure dot -->
+  <circle cx="80" cy="140" r="4" fill="#6a5aaa" opacity="0.9"/>
+  <circle cx="80" cy="140" r="8" fill="#6a5aaa" opacity="0.15"/>
+
+  <!-- Destination dot -->
+  <circle cx="560" cy="130" r="4" fill="#8a7abf" opacity="0.9"/>
+  <circle cx="560" cy="130" r="8" fill="#8a7abf" opacity="0.15"/>
+
+  <!-- Departure label -->
+  <text x="80" y="162" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="10" fill="#6a5aaa" letter-spacing="0.12em" opacity="0.8">DEPARTURE</text>
+
+  <!-- Destination label -->
+  <text x="560" y="152" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="10" fill="#8a7abf" letter-spacing="0.12em" opacity="0.8">ARRIVAL</text>
+
+  <!-- Airplane icon at ~55% along the arc (roughly x=340, y=68) -->
+  <!-- Plane body -->
+  <g transform="translate(330, 72) rotate(-18)" filter="url(#glow)">
+    <!-- Main fuselage -->
+    <ellipse cx="0" cy="0" rx="18" ry="5" fill="url(#planeGrad)"/>
+    <!-- Nose cone -->
+    <ellipse cx="16" cy="0" rx="6" ry="3.5" fill="url(#planeGrad)"/>
+    <!-- Tail -->
+    <ellipse cx="-16" cy="0" rx="5" ry="3" fill="#d0c0f0"/>
+    <!-- Main wings -->
+    <path d="M 2,-4 L -6,-18 L -14,-16 L -4,0 Z" fill="url(#planeGrad)"/>
+    <path d="M 2,4 L -6,18 L -14,16 L -4,0 Z" fill="url(#planeGrad)"/>
+    <!-- Tail fins -->
+    <path d="M -12,-2 L -18,-10 L -20,-8 L -14,0 Z" fill="#c8b8f0"/>
+    <path d="M -12,2 L -18,10 L -20,8 L -14,0 Z" fill="#c8b8f0"/>
+    <!-- Engine pods -->
+    <ellipse cx="-3" cy="-10" rx="6" ry="2.5" fill="#b8a8e0"/>
+    <ellipse cx="-3" cy="10" rx="6" ry="2.5" fill="#b8a8e0"/>
+  </g>
+
+  <!-- Plane glow halo -->
+  <circle cx="336" cy="70" r="22" fill="#7060c0" opacity="0.08" filter="url(#softGlow)"/>
+
+  <!-- Title: Flight Focus -->
+  <text x="320" y="185" text-anchor="middle"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+        font-size="13"
+        font-weight="500"
+        letter-spacing="0.25em"
+        fill="#9080c8"
+        opacity="0.75">FLIGHT FOCUS</text>
+</svg>

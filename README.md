@@ -1,4 +1,6 @@
-<p align="center"><img src="img/first-day.png" width="640" alt="Flight Focus — first class cabin, in flight" /></p>
+<p align="center">
+  <img src="img/flight-focus-icon.svg" width="640" alt="Flight Focus — in flight" />
+</p>
 <h1 align="center">Flight Focus ✈</h1>
 <p align="center">
   <strong>your focus session, boarded as a real flight</strong>
